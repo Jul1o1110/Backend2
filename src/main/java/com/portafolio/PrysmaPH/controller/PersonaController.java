@@ -1,37 +1,44 @@
 package com.portafolio.PrysmaPH.controller;
 
 import com.portafolio.PrysmaPH.model.Persona;
-import com.portafolio.PrysmaPH.repository.PersonaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.portafolio.PrysmaPH.service.Persona.PersonaServiceInt;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/personas") 
+@RequestMapping("/api/personas")
+@CrossOrigin(origins = "*")
 public class PersonaController {
 
-    @Autowired
-    private PersonaRepository personaRepository;
+    private final PersonaServiceInt personaService;
+
+    public PersonaController(PersonaServiceInt personaService) {
+        this.personaService = personaService;
+    }
 
     @GetMapping
-    public List<Persona> listarPersonas() {
-        return personaRepository.findAll();
+    public List<Persona> getAll() {
+        return personaService.listarPersonas();
     }
 
     @PostMapping
     public ResponseEntity<?> crearPersona(@RequestBody Persona persona) {
-        
-        if (persona.getNombreCompleto() == null || persona.getNombreCompleto().isEmpty()) {
-            return ResponseEntity.badRequest().body("El nombre completo es obligatorio.");
+        try {
+            Persona nuevaPersona = personaService.guardarPersona(persona);
+            return new ResponseEntity<>(nuevaPersona, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error al procesar la solicitud: " + e.getMessage());
         }
+    }
 
-        if (persona.getEmail() == null || !persona.getEmail().contains("@")) {
-            return ResponseEntity.badRequest().body("Debe proporcionar un email válido.");
-        }
-
-        Persona nuevaPersona = personaRepository.save(persona);
-        return ResponseEntity.ok(nuevaPersona);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable int id) {
+        personaService.eliminarPersona(id);
+        return ResponseEntity.noContent().build();
     }
 }

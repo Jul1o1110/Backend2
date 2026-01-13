@@ -1,49 +1,48 @@
 package com.portafolio.PrysmaPH.controller;
 
 import com.portafolio.PrysmaPH.model.Proyecto;
-import com.portafolio.PrysmaPH.repository.ProyectoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.portafolio.PrysmaPH.service.Proyecto.ProyectoServiceInt;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/proyectos")
+@CrossOrigin(origins = "*")
 public class ProyectoController {
 
-    @Autowired
-    private ProyectoRepository proyectoRepository;
+    private final ProyectoServiceInt proyectoService;
+
+    public ProyectoController(ProyectoServiceInt proyectoService) {
+        this.proyectoService = proyectoService;
+    }
 
     @GetMapping
     public List<Proyecto> listar() {
-        return proyectoRepository.findAll();
+        return proyectoService.listarProyectos();
     }
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Proyecto proyecto) {
-        if (proyecto.getNombre() == null || proyecto.getNombre().isEmpty()) {
-            return ResponseEntity.badRequest().body("El nombre del proyecto es obligatorio");
+        try {
+            Proyecto nuevoProyecto = proyectoService.guardarProyecto(proyecto);
+            return new ResponseEntity<>(nuevoProyecto, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error al guardar el proyecto.");
         }
-
-        if (proyecto.getUrlRepositorio() != null && !proyecto.getUrlRepositorio().startsWith("http")) {
-            return ResponseEntity.badRequest().body("La URL del repositorio debe ser un enlace válido");
-        }
-
-        if (proyecto.getTipoProyecto() == null || proyecto.getTipoProyecto().getId() == 0) {
-            return ResponseEntity.badRequest().body("El proyecto debe estar asociado a un tipo de proyecto válido");
-        }
-
-        Proyecto nuevoProyecto = proyectoRepository.save(proyecto);
-        return ResponseEntity.ok(nuevoProyecto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable int id) {
-        if (!proyectoRepository.existsById(id)) {
+        if (!proyectoService.existePorId(id)) {
             return ResponseEntity.notFound().build();
         }
-        proyectoRepository.deleteById(id);
+        
+        proyectoService.eliminarProyecto(id);
         return ResponseEntity.ok("Proyecto eliminado correctamente");
     }
 }

@@ -1,45 +1,47 @@
 package com.portafolio.PrysmaPH.controller;
 
 import com.portafolio.PrysmaPH.model.Habilidad;
-import com.portafolio.PrysmaPH.repository.HabilidadRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.portafolio.PrysmaPH.service.Habilidad.HabilidadServiceInt;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/habilidades")
 public class HabilidadController {
 
-    @Autowired
-    private HabilidadRepository habilidadRepository;
+    private final HabilidadServiceInt habilidadService;
+
+    public HabilidadController(HabilidadServiceInt habilidadService) {
+        this.habilidadService = habilidadService;
+    }
 
     @GetMapping
     public List<Habilidad> listar() {
-        return habilidadRepository.findAll();
+        return habilidadService.listarHabilidades();
     }
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Habilidad habilidad) {
-        if (habilidad.getNombre() == null || habilidad.getNombre().isEmpty()) {
-            return ResponseEntity.badRequest().body("El nombre de la habilidad es obligatorio");
+        try {
+            Habilidad nuevaHabilidad = habilidadService.guardarHabilidad(habilidad);
+            return new ResponseEntity<>(nuevaHabilidad, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error al guardar la habilidad.");
         }
-
-        if (habilidad.getTipo() == null || habilidad.getTipo().isEmpty()) {
-            return ResponseEntity.badRequest().body("El tipo de habilidad es obligatorio");
-        }
-
-        Habilidad nuevaHabilidad = habilidadRepository.save(habilidad);
-        return ResponseEntity.ok(nuevaHabilidad);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable int id) {
-        if (!habilidadRepository.existsById(id)) {
+        if (!habilidadService.existePorId(id)) {
             return ResponseEntity.notFound().build();
         }
-        habilidadRepository.deleteById(id);
+        
+        habilidadService.eliminarHabilidad(id);
         return ResponseEntity.ok("Habilidad eliminada correctamente");
     }
 }

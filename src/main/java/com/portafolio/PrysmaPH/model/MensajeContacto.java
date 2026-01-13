@@ -1,12 +1,16 @@
 package com.portafolio.PrysmaPH.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "MENSAJE_CONTACTO")
 public class MensajeContacto {
 

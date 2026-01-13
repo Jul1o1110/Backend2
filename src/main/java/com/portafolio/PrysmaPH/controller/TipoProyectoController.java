@@ -1,32 +1,38 @@
 package com.portafolio.PrysmaPH.controller;
 
 import com.portafolio.PrysmaPH.model.TipoProyecto;
-import com.portafolio.PrysmaPH.repository.TipoProyectoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.portafolio.PrysmaPH.service.TipoProyecto.TipoProyectoServiceInt;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tipos-proyecto")
+@CrossOrigin(origins = "*")
 public class TipoProyectoController {
 
-    @Autowired
-    private TipoProyectoRepository tipoProyectoRepository;
+    private final TipoProyectoServiceInt tipoProyectoService;
+
+    public TipoProyectoController(TipoProyectoServiceInt tipoProyectoService) {
+        this.tipoProyectoService = tipoProyectoService;
+    }
 
     @GetMapping
     public List<TipoProyecto> listar() {
-        return tipoProyectoRepository.findAll();
+        return tipoProyectoService.listarTipos();
     }
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody TipoProyecto tipoProyecto) {
-        if (tipoProyecto.getNombre() == null || tipoProyecto.getNombre().isEmpty()) {
-            return ResponseEntity.badRequest().body("El nombre del tipo de proyecto es obligatorio");
+        try {
+            TipoProyecto nuevoTipo = tipoProyectoService.guardarTipo(tipoProyecto);
+            return new ResponseEntity<>(nuevoTipo, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error al crear el tipo de proyecto");
         }
-        
-        TipoProyecto nuevoTipo = tipoProyectoRepository.save(tipoProyecto);
-        return ResponseEntity.ok(nuevoTipo);
     }
 }

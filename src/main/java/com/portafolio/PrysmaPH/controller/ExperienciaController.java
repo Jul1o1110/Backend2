@@ -1,44 +1,43 @@
 package com.portafolio.PrysmaPH.controller;
 
 import com.portafolio.PrysmaPH.model.Experiencia;
-import com.portafolio.PrysmaPH.repository.ExperienciaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.portafolio.PrysmaPH.service.Experiencia.ExperienciaServiceInt;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/experiencias")
 public class ExperienciaController {
 
-    @Autowired
-    private ExperienciaRepository experienciaRepository;
+    private final ExperienciaServiceInt experienciaService;
+
+    public ExperienciaController(ExperienciaServiceInt experienciaService) {
+        this.experienciaService = experienciaService;
+    }
 
     @GetMapping
     public List<Experiencia> listar() {
-        return experienciaRepository.findAll();
+        return experienciaService.listarExperiencias();
     }
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Experiencia experiencia) {
-        if (experiencia.getTitulo() == null || experiencia.getTitulo().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título es obligatorio");
+        try {
+            Experiencia nuevaExperiencia = experienciaService.guardarExperiencia(experiencia);
+            return new ResponseEntity<>(nuevaExperiencia, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error al guardar la experiencia: " + e.getMessage());
         }
+    }
 
-        if (experiencia.getInstitucionEmpresa() == null || experiencia.getInstitucionEmpresa().isEmpty()) {
-            return ResponseEntity.badRequest().body("La institución o empresa es obligatoria");
-        }
-
-        if (experiencia.getFechaInicio() == null) {
-            return ResponseEntity.badRequest().body("La fecha de inicio es obligatoria");
-        }
-
-        if (experiencia.getPersona() == null || experiencia.getPersona().getId() == 0) {
-            return ResponseEntity.badRequest().body("La experiencia debe estar asociada a una persona válida");
-        }
-
-        Experiencia nuevaExperiencia = experienciaRepository.save(experiencia);
-        return ResponseEntity.ok(nuevaExperiencia);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable int id) {
+        experienciaService.eliminarExperiencia(id);
+        return ResponseEntity.noContent().build();
     }
 }
