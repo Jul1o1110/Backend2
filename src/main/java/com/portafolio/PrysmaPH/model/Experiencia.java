@@ -1,12 +1,16 @@
 package com.portafolio.PrysmaPH.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "EXPERIENCIA")
 public class Experiencia {
 
@@ -26,12 +30,4 @@ public class Experiencia {
     @ManyToOne
     @JoinColumn(name = "persona_id")
     private Persona persona;
-
-    public Experiencia(String titulo, String institucionEmpresa, LocalDate fechaInicio, Persona persona) {
-        this.titulo = titulo;
-        this.institucionEmpresa = institucionEmpresa;
-        this.fechaInicio = fechaInicio;
-        this.persona = persona;
-    }
-
 }

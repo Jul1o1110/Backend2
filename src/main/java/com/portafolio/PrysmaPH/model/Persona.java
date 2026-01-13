@@ -1,12 +1,15 @@
 package com.portafolio.PrysmaPH.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor 
+@AllArgsConstructor
 @Table(name = "PERSONA")
 public class Persona {
 
@@ -28,11 +31,4 @@ public class Persona {
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL)
     private List<Experiencia> experiencias;
-
-    public Persona(String nombreCompleto, String tituloProfesional, String email, String resumenBio) {
-        this.nombreCompleto = nombreCompleto;
-        this.tituloProfesional = tituloProfesional;
-        this.email = email;
-        this.resumenBio = resumenBio;
-    }
 }
