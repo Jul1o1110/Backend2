@@ -1,5 +1,6 @@
 package com.portafolio.PrysmaPH.controller;
 
+import com.portafolio.PrysmaPH.dto.MensajeContactoDTO;
 import com.portafolio.PrysmaPH.model.MensajeContacto;
 import com.portafolio.PrysmaPH.service.MensajeContacto.MensajeContactoServiceInt;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,9 @@ public class MensajeContactoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> enviarMensaje(@RequestBody MensajeContacto mensaje) {
+    public ResponseEntity<?> enviarMensaje(@RequestBody MensajeContactoDTO mensajeDTO) {
         try {
-            MensajeContacto nuevoMensaje = mensajeService.guardarMensaje(mensaje);
+            MensajeContacto nuevoMensaje = mensajeService.guardarMensaje(mensajeDTO);
             return new ResponseEntity<>(nuevoMensaje, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -1,5 +1,6 @@
 package com.portafolio.PrysmaPH.controller;
 
+import com.portafolio.PrysmaPH.dto.HabilidadDTO;
 import com.portafolio.PrysmaPH.model.Habilidad;
 import com.portafolio.PrysmaPH.service.Habilidad.HabilidadServiceInt;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,9 @@ public class HabilidadController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody Habilidad habilidad) {
+    public ResponseEntity<?> crear(@RequestBody HabilidadDTO habilidadDTO) {
         try {
-            Habilidad nuevaHabilidad = habilidadService.guardarHabilidad(habilidad);
+            Habilidad nuevaHabilidad = habilidadService.guardarHabilidad(habilidadDTO);
             return new ResponseEntity<>(nuevaHabilidad, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

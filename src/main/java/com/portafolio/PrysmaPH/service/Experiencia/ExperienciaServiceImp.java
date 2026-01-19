@@ -1,7 +1,9 @@
 package com.portafolio.PrysmaPH.service.Experiencia;
 
+import com.portafolio.PrysmaPH.dto.ExperienciaDTO;
 import com.portafolio.PrysmaPH.model.Experiencia;
 import com.portafolio.PrysmaPH.repository.ExperienciaRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +12,11 @@ import java.util.Optional;
 public class ExperienciaServiceImp implements ExperienciaServiceInt {
 
     private final ExperienciaRepository experienciaRepository;
+    private final ModelMapper modelMapper;
 
-    public ExperienciaServiceImp(ExperienciaRepository experienciaRepository) {
+    public ExperienciaServiceImp(ExperienciaRepository experienciaRepository, ModelMapper modelMapper) {
         this.experienciaRepository = experienciaRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -26,22 +30,19 @@ public class ExperienciaServiceImp implements ExperienciaServiceInt {
     }
 
     @Override
-    public Experiencia guardarExperiencia(Experiencia experiencia) {
-        if (experiencia.getTitulo() == null || experiencia.getTitulo().isEmpty()) {
+    public Experiencia guardarExperiencia(ExperienciaDTO experienciaDTO) {
+        if (experienciaDTO.getTitulo() == null || experienciaDTO.getTitulo().isEmpty()) {
             throw new IllegalArgumentException("El título es obligatorio");
         }
 
-        if (experiencia.getInstitucionEmpresa() == null || experiencia.getInstitucionEmpresa().isEmpty()) {
+        if (experienciaDTO.getInstitucionEmpresa() == null || experienciaDTO.getInstitucionEmpresa().isEmpty()) {
             throw new IllegalArgumentException("La institución o empresa es obligatoria");
         }
 
-        if (experiencia.getFechaInicio() == null) {
+        if (experienciaDTO.getFechaInicio() == null) {
             throw new IllegalArgumentException("La fecha de inicio es obligatoria");
         }
-
-        if (experiencia.getPersona() == null || experiencia.getPersona().getId() == 0) {
-            throw new IllegalArgumentException("La experiencia debe estar asociada a una persona válida");
-        }
+        Experiencia experiencia = modelMapper.map(experienciaDTO, Experiencia.class);
 
         return experienciaRepository.save(experiencia);
     }

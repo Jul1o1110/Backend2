@@ -1,18 +1,23 @@
 package com.portafolio.PrysmaPH.service.MensajeContacto;
 
+import com.portafolio.PrysmaPH.dto.MensajeContactoDTO;
 import com.portafolio.PrysmaPH.model.MensajeContacto;
 import com.portafolio.PrysmaPH.repository.MensajeContactoRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import org.modelmapper.ModelMapper;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class MensajeContactoServiceImp implements MensajeContactoServiceInt {
 
     private final MensajeContactoRepository mensajeRepository;
+    private final ModelMapper modelMapper;
 
-    public MensajeContactoServiceImp(MensajeContactoRepository mensajeRepository) {
+
+    public MensajeContactoServiceImp(MensajeContactoRepository mensajeRepository , ModelMapper modelMapper) {
         this.mensajeRepository = mensajeRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -21,20 +26,21 @@ public class MensajeContactoServiceImp implements MensajeContactoServiceInt {
     }
 
     @Override
-    public MensajeContacto guardarMensaje(MensajeContacto mensaje) {
-        if (mensaje.getNombreRemitente() == null || mensaje.getNombreRemitente().isEmpty()) {
+    public MensajeContacto guardarMensaje(MensajeContactoDTO mensajeDTO) {
+        if (mensajeDTO.getNombreRemitente() == null || mensajeDTO.getNombreRemitente().isEmpty()) {
             throw new IllegalArgumentException("El nombre del remitente es obligatorio");
         }
-        if (mensaje.getEmailRemitente() == null || !mensaje.getEmailRemitente().contains("@")) {
+        if (mensajeDTO.getEmailRemitente() == null || !mensajeDTO.getEmailRemitente().contains("@")) {
             throw new IllegalArgumentException("El email proporcionado no es válido");
         }
-        if (mensaje.getMensaje() == null || mensaje.getMensaje().trim().isEmpty()) {
+        if (mensajeDTO.getMensaje() == null || mensajeDTO.getMensaje().trim().isEmpty()) {
             throw new IllegalArgumentException("El contenido del mensaje no puede estar vacío");
         }
 
-        if (mensaje.getFechaEnvio() == null) {
-            mensaje.setFechaEnvio(LocalDateTime.now());
+        if (mensajeDTO.getFechaEnvio() == null) {
+            mensajeDTO.setFechaEnvio(LocalDate.now());
         }
+        MensajeContacto mensaje = modelMapper.map(mensajeDTO , MensajeContacto.class);
 
         return mensajeRepository.save(mensaje);
     }

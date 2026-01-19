@@ -1,12 +1,13 @@
 package com.portafolio.PrysmaPH.controller;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import com.portafolio.PrysmaPH.model.Experiencia;
+import com.portafolio.PrysmaPH.dto.ExperienciaDTO;
 import com.portafolio.PrysmaPH.service.Experiencia.ExperienciaServiceInt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/experiencias")
@@ -26,9 +27,9 @@ public class ExperienciaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody Experiencia experiencia) {
+    public ResponseEntity<?> crear(@RequestBody ExperienciaDTO experienciaDTO) { 
         try {
-            Experiencia nuevaExperiencia = experienciaService.guardarExperiencia(experiencia);
+            Experiencia nuevaExperiencia = experienciaService.guardarExperiencia(experienciaDTO);
             return new ResponseEntity<>(nuevaExperiencia, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
