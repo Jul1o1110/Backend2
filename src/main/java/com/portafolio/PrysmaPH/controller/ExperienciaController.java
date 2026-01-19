@@ -1,5 +1,5 @@
 package com.portafolio.PrysmaPH.controller;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.portafolio.PrysmaPH.model.Experiencia;
 import com.portafolio.PrysmaPH.service.Experiencia.ExperienciaServiceInt;
 import org.springframework.http.HttpStatus;
@@ -7,8 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/experiencias")
+@CrossOrigin(origins = "*")
+@Tag(name = "Experiencias", description = "Operaciones sobre experiencias")
 public class ExperienciaController {
 
     private final ExperienciaServiceInt experienciaService;
