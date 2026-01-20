@@ -3,6 +3,10 @@ package com.portafolio.PrysmaPH.controller;
 import com.portafolio.PrysmaPH.dto.HabilidadDTO;
 import com.portafolio.PrysmaPH.model.Habilidad;
 import com.portafolio.PrysmaPH.service.Habilidad.HabilidadServiceInt;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/habilidades")
+@CrossOrigin(origins = "*")
+@Tag(name = "Habilidades", description = "Habilidades de los ingenieros.")
 public class HabilidadController {
 
     private final HabilidadServiceInt habilidadService;
@@ -18,11 +24,13 @@ public class HabilidadController {
         this.habilidadService = habilidadService;
     }
 
+    @Operation(summary = "Obtener lista de habilidades", description = "Retorna un listado de todas las habilidades de los ingenieros.")
     @GetMapping
     public List<Habilidad> listar() {
         return habilidadService.listarHabilidades();
     }
 
+    @Operation(summary = "Resgistrar nueva habilidad", description = "Registra una nueva habilidad adquirida por una nueva tecnica.")
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody HabilidadDTO habilidadDTO) {
         try {
@@ -36,6 +44,7 @@ public class HabilidadController {
         }
     }
 
+    @Operation(summary = "Eliminar habilidad", description = "Borra de la base de datos por Id.")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable int id) {
         if (!habilidadService.existePorId(id)) {

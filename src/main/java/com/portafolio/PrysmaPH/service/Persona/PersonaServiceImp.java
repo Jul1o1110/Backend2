@@ -1,8 +1,9 @@
 package com.portafolio.PrysmaPH.service.Persona;
-
+import com.portafolio.PrysmaPH.dto.PersonaDTO;
 import com.portafolio.PrysmaPH.model.Persona;
 import com.portafolio.PrysmaPH.repository.PersonaRepository;
 import org.springframework.stereotype.Service;
+import org.modelmapper.ModelMapper;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,8 +11,10 @@ import java.util.Optional;
 public class PersonaServiceImp implements PersonaServiceInt {
 
     private final PersonaRepository personaRepository;
+    private final ModelMapper modelMapper;
 
-    public PersonaServiceImp(PersonaRepository personaRepository) {
+    public PersonaServiceImp(PersonaRepository personaRepository, ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
         this.personaRepository = personaRepository;
     }
 
@@ -26,7 +29,8 @@ public class PersonaServiceImp implements PersonaServiceInt {
     }
 
     @Override
-    public Persona guardarPersona(Persona persona) {
+    public Persona guardarPersona(PersonaDTO personaDTO) {
+        Persona persona = modelMapper.map(personaDTO, Persona.class);
         return personaRepository.save(persona);
     }
 
